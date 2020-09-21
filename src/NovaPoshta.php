@@ -16,11 +16,12 @@ class NovaPoshta
     public static function getCities($search = null)
     {
         $list = $search
-            ? self::get('cities.json')->filter(function ($item) use ($search) {
-                return app()->getLocale() == 'ua'
-                    ? strpos($item->Description, $search) !== false
-                    : strpos($item->DescriptionRu, $search) !== false;
-            })
+            ? self::get('cities.json')
+                ->filter(function ($item) use ($search) {
+                    return app()->getLocale() == 'ua'
+                        ? strpos($item->Description, $search) !== false
+                        : strpos($item->DescriptionRu, $search) !== false;
+                })
             : self::get('cities.json');
 
         return $list
@@ -31,11 +32,12 @@ class NovaPoshta
     public static function getWarehouses($city_id, $search = null)
     {
         $list = $search
-            ? self::get("warehouses/$city_id.json")->filter(function ($item) use ($search) {
-                return app()->getLocale() == 'ua'
-                ? strpos($item->Description, $search) !== false
-                    : strpos($item->DescriptionRu, $search) !== false;
-            })
+            ? self::get("warehouses/$city_id.json")
+                ->filter(function ($item) use ($search) {
+                    return app()->getLocale() == 'ua'
+                    ? strpos($item->Description, $search) !== false
+                        : strpos($item->DescriptionRu, $search) !== false;
+                })
             : self::get("warehouses/$city_id.json");
 
         return $list
