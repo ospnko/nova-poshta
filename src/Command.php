@@ -2,11 +2,11 @@
 
 namespace ScaryLayer\NovaPoshta;
 
-use Illuminate\Console\Command;
+use Illuminate\Console\Command as ConsoleCommand;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
-class NovaPoshta extends Command
+class Command extends ConsoleCommand
 {
     /**
      * The name and signature of the console command.
