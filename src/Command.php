@@ -42,7 +42,6 @@ class Command extends ConsoleCommand
         $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
             "modelName" => "Address",
             "calledMethod" => "getCities",
-            "apiKey" => config('app.services.nova-poshta')
         ]);
 
         Storage::put(
@@ -55,7 +54,6 @@ class Command extends ConsoleCommand
         $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
             "modelName" => "Address",
             "calledMethod" => "getWarehouses",
-            "apiKey" => config('app.services.nova-poshta')
         ]);
 
         $list = collect($response->json()['data'])->groupBy('CityRef');
