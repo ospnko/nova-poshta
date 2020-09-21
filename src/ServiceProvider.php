@@ -9,7 +9,7 @@ class ServiceProvider extends Provider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([NovaPoshta::class]);
+            $this->commands([Command::class]);
         }
     }
 }

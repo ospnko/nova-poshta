@@ -2,67 +2,50 @@
 
 namespace ScaryLayer\NovaPoshta;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
-class NovaPoshta extends Command
+class NovaPoshta
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'nova-poshta:load';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Loads cities and warehouses lists';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    private static function get($name)
     {
-        parent::__construct();
+        return collect(
+            json_decode(Storage::get("nova-poshta/$name"))
+        );
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public static function getCities($search = null)
     {
-        $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
-            "modelName" => "Address",
-            "calledMethod" => "getCities",
-            "apiKey" => config('app.services.nova-poshta')
-        ]);
+        $list = $search
+            ? self::get('cities.json')->filter(function ($item) use ($search) {
+                return app()->getLocale() == 'ua'
+                    ? strpos($item->Description, $search) !== false
+                    : strpos($item->DescriptionRu, $search) !== false;
+            })
+            : self::get('cities.json');
 
-        Storage::put(
-            'nova-poshta/cities.json',
-            collect($response->json()['data'])->toJson()
-        );
+        return $list
+            ->sortBy(self::getNameField())
+            ->pluck(self::getNameField(), 'Ref');
+    }
 
-        $this->info('Cities was loaded successfully');
+    public static function getWarehouses($city_id, $search = null)
+    {
+        $list = $search
+            ? self::get("warehouses/$city_id.json")->filter(function ($item) use ($search) {
+                return app()->getLocale() == 'ua'
+                ? strpos($item->Description, $search) !== false
+                    : strpos($item->DescriptionRu, $search) !== false;
+            })
+            : self::get("warehouses/$city_id.json");
 
-        $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
-            "modelName" => "Address",
-            "calledMethod" => "getWarehouses",
-            "apiKey" => config('app.services.nova-poshta')
-        ]);
+        return $list
+            ->sortBy(self::getNameField())
+            ->sortBy('Number')
+            ->pluck(self::getNameField(), 'Ref');
+    }
 
-        $list = collect($response->json()['data'])->groupBy('CityRef');
-        foreach ($list as $cityRef => $group) {
-            Storage::put("nova-poshta/warehouses/$cityRef.json", $group->toJson());
-        }
-
-        $this->info('Warehouses was loaded successfully');
+    private static function getNameField()
+    {
+        return app()->getLocale() == 'ua' ? 'Description' : 'DescriptionRu';
     }
 }
