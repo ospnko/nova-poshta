@@ -1,5 +1,6 @@
 {
     "name": "scary-layer/nova-poshta",
+    "description": "Nova poshta warehouses pre-loader",
     "license": "MIT",
     "authors": [
         {
@@ -18,7 +19,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ScaryLayer\\NovaPoshta\\Providers\\ServiceProvider"
+                "ScaryLayer\\NovaPoshta\\ServiceProvider"
             ]
         }
     }
