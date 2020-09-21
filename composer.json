@@ -1,0 +1,25 @@
+{
+    "name": "scary-layer/nova-poshta",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "scary-layer",
+            "email": "artur.osipenko@hotmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ScaryLayer\\NovaPoshta\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ScaryLayer\\NovaPoshta\\Providers\\ServiceProvider"
+            ]
+        }
+    }
+}
