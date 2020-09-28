@@ -19,14 +19,17 @@ class NovaPoshta
             ? self::get('cities.json')
                 ->filter(function ($item) use ($search) {
                     return app()->getLocale() == 'ua'
-                        ? strpos($item->Description, $search) !== false
-                        : strpos($item->DescriptionRu, $search) !== false;
+                        ? mb_stripos($item->Description, $search) !== false
+                        : mb_stripos($item->DescriptionRu, $search) !== false;
                 })
-            : self::get('cities.json');
+                ->sortBy(function ($item) {
+                    return ((int) $item->IsBranch)
+                        ? -10000
+                        : $item->{self::getNameField()};
+                })
+            : self::get('cities.json')->sortBy(self::getNameField());
 
-        return $list
-            ->sortBy(self::getNameField())
-            ->pluck(self::getNameField(), 'Ref');
+        return $list->pluck(self::getNameField(), 'Ref');
     }
 
     public static function getWarehouses($city_id, $search = null)
@@ -35,8 +38,8 @@ class NovaPoshta
             ? self::get("warehouses/$city_id.json")
                 ->filter(function ($item) use ($search) {
                     return app()->getLocale() == 'ua'
-                    ? strpos($item->Description, $search) !== false
-                        : strpos($item->DescriptionRu, $search) !== false;
+                        ? mb_stripos($item->Description, $search) !== false
+                        : mb_stripos($item->DescriptionRu, $search) !== false;
                 })
             : self::get("warehouses/$city_id.json");
 
