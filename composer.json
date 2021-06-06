@@ -19,7 +19,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ScaryLayer\\NovaPoshta\\ServiceProvider"
+                "ScaryLayer\\NovaPoshta\\Providers\\ServiceProvider"
             ]
         }
     }

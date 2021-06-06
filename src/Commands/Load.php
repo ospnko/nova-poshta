@@ -1,12 +1,12 @@
 <?php
 
-namespace ScaryLayer\NovaPoshta;
+namespace ScaryLayer\NovaPoshta\Commands;
 
-use Illuminate\Console\Command as ConsoleCommand;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
-class Command extends ConsoleCommand
+class Load extends Command
 {
     /**
      * The name and signature of the console command.
@@ -20,7 +20,7 @@ class Command extends ConsoleCommand
      *
      * @var string
      */
-    protected $description = 'Loads cities and warehouses lists';
+    protected $description = 'Loads and store cities and warehouses lists';
 
     /**
      * Create a new command instance.
@@ -39,6 +39,18 @@ class Command extends ConsoleCommand
      */
     public function handle()
     {
+        $this->getCities();
+        $this->info('Cities was loaded successfully');
+
+        $this->getWarehouses();
+        $this->info('Warehouses was loaded successfully');
+    }
+
+    /**
+     * Get cities from Nova Poshta and put it to json file into storage folder
+     */
+    protected function getCities(): void
+    {
         $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
             "modelName" => "Address",
             "calledMethod" => "getCities",
@@ -48,9 +60,14 @@ class Command extends ConsoleCommand
             'nova-poshta/cities.json',
             collect($response->json()['data'])->toJson()
         );
+    }
 
-        $this->info('Cities was loaded successfully');
-
+    /**
+     * Get warehouses from Nova Poshta and put warehouses of each city into
+     * separate json files into storage folder
+     */
+    protected function getWarehouses(): void
+    {
         $response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
             "modelName" => "Address",
             "calledMethod" => "getWarehouses",
@@ -58,9 +75,8 @@ class Command extends ConsoleCommand
 
         $list = collect($response->json()['data'])->groupBy('CityRef');
         foreach ($list as $cityRef => $group) {
-            Storage::put("nova-poshta/warehouses/$cityRef.json", $group->toJson());
+            $path = "nova-poshta/warehouses/$cityRef.json";
+            Storage::put($path, $group->toJson());
         }
-
-        $this->info('Warehouses was loaded successfully');
     }
 }
